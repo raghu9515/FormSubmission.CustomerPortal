@@ -1,0 +1,4 @@
+@page "/track"
+@using FormSubmission.PublicPortal.Models
+@inject FormSubmission.PublicPortal.Services.SubmissionApiService Api
+<div class="card"><h2>Track Submission</h2><div class="form-row"><label>Reference Id</label><InputText @bind-Value="idText"/></div><button @onclick="TrackAsync">Track</button>@if(submission is not null){<h3>Status: @submission.Status</h3><p><b>Name:</b> @submission.FullName</p><p><b>Email:</b> @submission.Email</p><p><b>Message:</b> @submission.Message</p>}@if(error is not null){<p class="error">@error</p>}</div>@code{private string idText="";private SubmissionDto? submission;private string? error;private async Task TrackAsync(){error=null;submission=null;if(!Guid.TryParse(idText,out var id)){error="Invalid reference id.";return;}submission=await Api.GetByIdAsync(id);if(submission is null)error="Not found or API not running.";}}

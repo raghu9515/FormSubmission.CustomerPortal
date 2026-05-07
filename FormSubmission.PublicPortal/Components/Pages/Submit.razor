@@ -1,0 +1,61 @@
+@page "/submit"
+
+@using FormSubmission.PublicPortal.Models
+@using Microsoft.AspNetCore.Components.Forms
+@inject FormSubmission.PublicPortal.Services.SubmissionApiService Api
+
+<div class="card">
+    <h2>Submit Form</h2>
+
+    <EditForm Model="@model" OnValidSubmit="@SubmitAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-row">
+            <label>Full Name</label>
+            <InputText @bind-Value="model.FullName" />
+            <ValidationMessage For="@(() => model.FullName)" />
+        </div>
+
+        <div class="form-row">
+            <label>Email</label>
+            <InputText @bind-Value="model.Email" />
+            <ValidationMessage For="@(() => model.Email)" />
+        </div>
+
+        <div class="form-row">
+            <label>Message</label>
+            <InputTextArea @bind-Value="model.Message" />
+            <ValidationMessage For="@(() => model.Message)" />
+        </div>
+
+        <button type="submit">Submit</button>
+    </EditForm>
+
+    @if (submissionId is not null)
+    {
+        <p class="success">Submitted successfully. Reference Id: <b>@submissionId</b></p>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <p class="error">@error</p>
+    }
+</div>
+
+@code {
+    private CreateSubmissionRequest model = new();
+    private Guid? submissionId;
+    private string? error;
+
+    private async Task SubmitAsync()
+    {
+        error = null;
+        submissionId = await Api.CreateAsync(model);
+
+        if (submissionId is null)
+        {
+            error = "Submission failed. Please check if API is running.";
+        }
+    }
+}
